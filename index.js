@@ -23,36 +23,27 @@ app.get("/api/hello", function (req, res) {
   res.json({ greeting: "hello API" });
 });
 
-/*
-A request to /api/1451001600000 should return { unix: 1451001600000, utc: "Fri, 25 Dec 2015 00:00:00 GMT" }
-*/
 // unix timestamp,
 app.get("/api/:date", function (req, res) {
-  console.log(req.params.date);
-  const newDate = req.params.date ? new Date(req.params.date) : new Date();
-  if (!newDate) {
+  // check if date is 13 integer string
+  let datestring = req.params.date;
+  console.log(datestring);
+  let isUnix = !!datestring.match(/\d{13}/);
+  console.log(isUnix);
+
+  // if unix, multiply by 1000 to get date, if not use normal
+  const newDate = isUnix ? new Date(datestring * 1000) : new Date(datestring);
+  console.log(newDate);
+  if (newDate.toUTCString() === "Invalid Date") {
     res.json({ error: "Invalid Date" });
   } else {
-    const unixdate = Math.floor(newDate.getTime() / 1000);
-    const datestring = newDate.toDateString();
-    console.log(unixdate);
-    console.log(datestring);
-    res.json({ unix: unixdate, utc: datestring });
+    res.json({ unix: newDate.valueOf(), utc: newDate.toUTCString() });
   }
 });
 
 app.get("/api/", function (req, res) {
   const newDate = new Date();
-  console.log(newDate);
-  if (!newDate) {
-    res.json({ error: "Invalid Date" });
-  } else {
-    const unixdate = Math.floor(newDate.getTime() / 1000);
-    const datestring = newDate.toDateString();
-    console.log(unixdate);
-    console.log(datestring);
-    res.json({ unix: unixdate, utc: datestring });
-  }
+  res.json({ unix: newDate.valueOf(), utc: newDate.toUTCString() });
 });
 
 // listen for requests :)

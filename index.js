@@ -23,24 +23,25 @@ app.get("/api/hello", function (req, res) {
   res.json({ greeting: "hello API" });
 });
 
-// unix timestamp,
+// main assignment
 app.get("/api/:date", function (req, res) {
   // check if date is 13 integer string
   let datestring = req.params.date;
-  console.log(datestring);
   let isUnix = !!datestring.match(/\d{13}/);
-  console.log(isUnix);
 
-  // if unix, multiply by 1000 to get date, if not use normal
-  const newDate = isUnix ? new Date(datestring * 1000) : new Date(datestring);
-  console.log(newDate);
-  if (newDate.toUTCString() === "Invalid Date") {
+  const newDate = new Date(datestring);
+  const dateInt = parseInt(datestring);
+  const unixDate = new Date(dateInt);
+  if (!isUnix && newDate.toUTCString() === "Invalid Date") {
     res.json({ error: "Invalid Date" });
+  } else if (isUnix) {
+    res.json({ unix: dateInt, utc: unixDate.toUTCString() });
   } else {
     res.json({ unix: newDate.valueOf(), utc: newDate.toUTCString() });
   }
 });
 
+// handle empty queries
 app.get("/api/", function (req, res) {
   const newDate = new Date();
   res.json({ unix: newDate.valueOf(), utc: newDate.toUTCString() });
